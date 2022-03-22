@@ -11,3 +11,6 @@ docker-compose build
 # create create django project using docker
 
 docker-compose run app sh -c "django-admin.py startproject app ."
+
+# settup trivis ci
+
