@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -19,10 +19,21 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.7]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: docker-compose build
+        run: docker-compose up -d
       - name: docker-compose Test
-        run: docker-compose run app sh -c "python manage.py wait_for_db && python manage.py test && flake8"
+        run: |
+          docker-compose run app sh -c "python manage.py wait_for_db && python manage.py test && flake8"
